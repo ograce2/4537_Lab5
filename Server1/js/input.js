@@ -17,7 +17,7 @@ class SQLInput{
 
         if (SQLInput.getQueries.includes(query.split(" ")[0].toUpperCase())){
             console.log("call GET");
-        } else if(SQLInput.getQueries.includes(query.split(" ")[0].toUpperCase())){
+        } else if(SQLInput.postQueries.includes(query.split(" ")[0].toUpperCase())){
             console.log("call POST")
         } else{
             console.log("invalid query");
