@@ -8,7 +8,7 @@ const INSERT = "INSERT";
 const POST = "POST";
 const GET = "GET";
 
-const endPointRoot = "PLACEHOLDER";
+const endPointRoot = "http://localhost:8080/";
 
 class SQLInput {
 
@@ -33,35 +33,47 @@ class SQLInput {
         }
     }
 
-    static sendInsert(insertQuery, responseID){
+    static sendInsert(insertQuery, responseID) {
 
         // FOR TESTING
-        document.getElementById(responseID).innerHTML = "INSERT QUERY: " + insertQuery;
-        return;
+        // document.getElementById(responseID).innerHTML = "INSERT QUERY: " + insertQuery;
+        console.log(typeof (insertQuery))
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open(POST, endpoint,  true);
+        xhttp.open(POST, endPointRoot, true);
+
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        const sendObj = {query: insertQuery};
-        xhttp.send(JSON.stringify(sendObj));
+
+        // const sendObj = { query: insertQuery };
+
+        xhttp.send(`insert=${insertQuery}`);
+
         xhttp.onreadystatechange = function () {
-            if (this.readState == 4 && this.status == 200){
+            if (this.readyState == 4 && this.status == 200) {
                 document.getElementById(responseID).innerHTML = this.responseText;
             }
         }
     }
 
-    static sendSelect(selectQuery, responseID){
+    static sendSelect(selectQuery, responseID) {
 
-        document.getElementById(responseID).innerHTML = "SELECT QUERY: " + selectQuery;
-        return;
+        // document.getElementById(responseID).innerHTML = "SELECT QUERY: " + selectQuery;
+
+        const xhttp = new XMLHttpRequest();
+
+        // for testing
+        console.log("TEST:" + selectQuery);
 
         const queryParam = "?selectquery=";
-        xhttp.open(GET, endpoint + queryParam + selectQuery, true);
+        xhttp.open(GET, endPointRoot + queryParam + selectQuery, true);
         xhttp.send();
         xhttp.onreadystatechange = function () {
-            if (this.readState == 4 && this.status == 200){
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(0);
+                console.log(this.responseText);
                 document.getElementById(responseID).innerHTML = this.responseText;
+            } else {
+                console.log(1);
             }
         }
     }
