@@ -1,7 +1,9 @@
 import mysql from "mysql";
 
-const DROP = "DROP ";
-const UPDATE = "UPDATE ";
+const DROP = "DROP";
+const UPDATE = "UPDATE";
+const DELETE = "DELETE";
+const ALTER = "ALTER";
 const ERROR_MSG = "Invalid query! Only use SELECT or INSERT";
 
 class Database {
@@ -9,12 +11,12 @@ class Database {
     static CONNECTION = null;
 
     /**
-     * Validates a query to ensure it does not contain DROP or UPDATE statements
+     * Validates a query to ensure it does not contain DROP, UPDATE, DELETE, or ALTER statements
      * @param {string} query the SQL query to validate
      * @returns {boolean} true if valid, false otherwise
      */
     static validateQuery(query) {
-        if (query === undefined || query.toUpperCase().includes(DROP) || query.toUpperCase().includes(UPDATE)) {
+        if (query === undefined || query.toUpperCase().includes(DROP) || query.toUpperCase().includes(UPDATE) || query.toUpperCase().includes(DELETE) || query.toUpperCase().includes(ALTER)) {
             return false;
         }
         return true;
