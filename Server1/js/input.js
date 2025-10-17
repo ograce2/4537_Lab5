@@ -10,7 +10,7 @@ const GET = "GET";
 const SELECT_QUERY_PARAM = "?selectquery=";
 const NEWLINE = "\n";
 
-const endPointRoot = "http://localhost:8080/";
+const endPointRoot = "https://comp-4537-lab-5-server.vercel.app/comp4537/api/v1/sql/";
 
 /**
  * The SQL Input class provides methods and HTML elements for users to select and insert
