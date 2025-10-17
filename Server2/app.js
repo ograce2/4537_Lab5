@@ -4,54 +4,21 @@ const querystring = require("querystring");
 const Database = require("./module/database.js").default;
 
 const PORT = 8080;
+const GET = "GET";
+const POST = "POST";
 
 class Server {
+    /**
+     * Starts the HTTP server
+     */
     static startServer() {
-        const server = http.createServer(async (req, res) => {
-            res.writeHead(200, {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*",
-            });
-
-            if (req.method === "POST") {
-                try {
-                    // let body = "";
-                    // req.on("data", (chunk) => {
-                    //     if (chunk != null) {
-                    //         body += chunk.toString();
-                    //     }
-                    // });
-
-                    // req.on("end", async () => {
-                    //     const q = url.parse(body, true)
-                    //     let response = await Database.insertQuery(q.query.insert);
-                    //     res.end(response);
-                    // })
-
-                    Server.handlePostRequest(req, res);
-
-                } catch (error) {
-                    console.error("DB error:", error);
-                    res.writeHead(500, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({ error: String(error) }));
-                }
+        const server = http.createServer((req, res) => {
+            if (req.method === POST) {
+                Server.handlePostRequest(req, res);
             }
 
-            if (req.method === "GET") {
-                let q = url.parse(req.url, true);
-                const selectQuery = q.query["selectquery"];
-                console.log("Test (startServer) Select Query: ", selectQuery);
-
-                try {
-                    const result = await Database.returnQuery(selectQuery);
-                    console.log("Test (startServer): result - ", result);
-                    res.end(JSON.stringify(result));
-                } catch (error) {
-                    console.error("DB error:", eroor);
-                    res.writeHead(500, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({ error: String(error) }));
-                }
+            if (req.method === GET) {
+                Server.handleGetRequest(req, res);
             }
         })
 
@@ -59,21 +26,68 @@ class Server {
         console.log(`Server is running and listening on ${PORT}`);
     }
 
-    static async handlePostRequest(req, res) {
+    /**
+     * Handles POST requests to the server
+     * @param {http.IncomingMessage} req request object
+     * @param {http.ServerResponse} res response object
+     */
+    static handlePostRequest(req, res) {
         let body = "";
-        req.on("data", function(chunk) {
+        req.on("data", function (chunk) {
             if (chunk != null) {
                 body += chunk.toString();
             }
         });
-    
+
         req.on("end", async () => {
-            // const q = url.parse(body, true);
-            const parsed = querystring.parse(body);
-            // console.log(q.path);
-            let response = await Database.insertQuery(parsed.insert);
-            res.end(JSON.stringify(response));
-        })
+            try {
+                const parsed = querystring.parse(body);
+                let response = await Database.insertQuery(parsed.insert);
+
+                res.writeHead(200, {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "*",
+                });
+                res.end(JSON.stringify(response));
+            } catch (error) {
+                console.error("Database error (Post):", error);
+                res.writeHead(500, {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "*",
+                });
+                res.end(error.sqlMessage);
+            }
+        });
+    }
+
+    /**
+     * Handles GET requests to the server
+     * @param {http.IncomingMessage} req request object
+     * @param {http.ServerResponse} res response object
+     */
+    static async handleGetRequest(req, res) {
+        try {
+            let q = url.parse(req.url, true);
+            const selectQuery = q.query["selectquery"];
+            const result = await Database.returnQuery(selectQuery);
+
+            res.writeHead(200, {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            });
+            res.end(JSON.stringify(result));
+        } catch (error) {
+            console.error("Database error (Get): ", error);
+            res.writeHead(500, {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+            });
+            res.end(error.sqlMessage);
+        }
     }
 }
 

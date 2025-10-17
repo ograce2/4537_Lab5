@@ -2,10 +2,17 @@ import mysql from "mysql";
 
 const DROP = "DROP ";
 const UPDATE = "UPDATE ";
+const ERROR_MSG = "Invalid query! Only use SELECT or INSERT";
 
 class Database {
+    // Holds the connection to the database
     static CONNECTION = null;
 
+    /**
+     * Validates a query to ensure it does not contain DROP or UPDATE statements
+     * @param {string} query the SQL query to validate
+     * @returns {boolean} true if valid, false otherwise
+     */
     static validateQuery(query) {
         if (query === undefined || query.toUpperCase().includes(DROP) || query.toUpperCase().includes(UPDATE)) {
             return false;
@@ -13,41 +20,34 @@ class Database {
         return true;
     }
 
+    /**
+     * Creates a connection to the database
+     */
     static createConnection() {
         const connection = mysql.createConnection({
-            host: "localhost",
-            database: "lab6-database",
-            user: "root",
-            password: ""
+            host: "sql3.freesqldatabase.com",
+            database: "sql3803373",
+            user: "sql3803373",
+            password: "QuUrCREAeE",
+            port: 3306
         });
 
         connection.connect((error) => {
-            if (error)
+            if (error) {
+                console.error(error);
                 throw error;
-
-            console.log("Test(createConnection): Connected!")
-        })
+            }
+        });
 
         Database.CONNECTION = connection;
-
-        // connection.connect(function(error) {
-        //     if (error)
-        //         throw error;
-
-        //     console.log("Test (returnQuery): Connected!");
-
-        //     let sql = "SELECT * FROM patient";
-
-        //     connection.query(sql, function(error, result) {
-        //         if (error)
-        //             throw error; 
-
-        //         // console.log(`Test (returnQuery): ${result.name}, ${result.dateOfBirth}`);
-        //         console.log(JSON.stringify(result));
-        //     });
-        // });
     }
 
+    /**
+     * Executes a query and returns the result
+     * 
+     * @param {string} query the SQL query to execute
+     * @returns {Promise} result of the query
+     */
     static returnQuery(query) {
         if (Database.CONNECTION === null) {
             Database.createConnection();
@@ -55,53 +55,50 @@ class Database {
 
         const connection = Database.CONNECTION;
 
-        console.log(query);
-
         if (!this.validateQuery(query)) {
-            return "INVALID QUERY";
+            return ERROR_MSG;
         }
 
         return new Promise((resolve, reject) => {
             if (!query) {
-                return resolve("No query!"); // TODO: resolve or reject? idk yet
+                return resolve(ERROR_MSG);
             }
 
             connection.query(query, (error, result) => {
                 if (error)
                     return reject(error);
-
-                console.log(`Test (returnQuery): ${JSON.stringify(result)}`);
 
                 resolve(result);
             });
         });
     }
 
+    /**
+     * Inserts a new record into the database
+     * @param {string} query the SQL query to execute
+     * @returns {Promise} result of the query
+     */
     static insertQuery(query) {
         if (Database.CONNECTION === null) {
             Database.createConnection();
         }
 
-        console.log("Test(insert): query - ", query);
-
         if (!this.validateQuery(query)) {
-            return "INVALID QUERY";
+            return ERROR_MSG;
         }
 
         const connection = Database.CONNECTION;
 
         return new Promise((resolve, reject) => {
             if (!query) {
-                return resolve("No query!"); // TODO: resolve or reject? idk yet
+                return resolve(ERROR_MSG);
             }
 
             connection.query(query, (error, result) => {
                 if (error)
                     return reject(error);
 
-                console.log(`Test (insertQuery): Data successfully inserted!`);
-                console.log(`Test (insertQuery): ${result.insertId}!`);
-                resolve(`Data successfully inserted!`);
+                resolve("Data successfully inserted!");
             });
         });
     }
