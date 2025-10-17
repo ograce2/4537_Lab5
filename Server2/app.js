@@ -1,6 +1,5 @@
 const http = require("http");
 const url = require("url");
-const querystring = require("querystring");
 const Database = require("./module/database.js").default;
 
 const PORT = 8080;
@@ -41,7 +40,7 @@ class Server {
 
         req.on("end", async () => {
             try {
-                const parsed = querystring.parse(body);
+                const parsed = Object.fromEntries(new URLSearchParams(body));
                 let response = await Database.insertQuery(parsed.insert);
 
                 res.writeHead(200, {

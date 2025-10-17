@@ -88,8 +88,6 @@ class SQLInput {
             if (this.readyState == 4 && this.status == 200) {
                 document.getElementById(responseID).innerHTML = this.responseText;
             } else {
-                console.log(1);
-                console.log(this.responseText);
                 document.getElementById(responseID).innerHTML = this.responseText;
             }
         }
